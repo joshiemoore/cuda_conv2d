@@ -2,6 +2,8 @@
 #define KERNEL_COLS 3
 
 /*
- *  Applies 2D convolution to a 3-channel BGR image from OpenCV.
+ * Applies 2D convolution to a 3-channel BGR image from OpenCV.
+ *
+ * Returns kernel execution time in milliseconds.
  */
-extern "C" void conv2d(const unsigned char* input, unsigned char* output, int rows, int cols, const char* kernel);
+extern "C" float conv2d(const unsigned char* input, unsigned char* output, int rows, int cols, const char* kernel);

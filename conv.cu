@@ -25,7 +25,7 @@ __global__ void conv2d_kernel(const unsigned char* input, unsigned char* output,
   }
 }
 
-extern "C" void conv2d(const unsigned char* input, unsigned char* output, int rows, int cols, const char* kernel) {
+extern "C" float conv2d(const unsigned char* input, unsigned char* output, int rows, int cols, const char* kernel) {
   const dim3 threads(32, 32);
   const dim3 blocks(
     (cols + threads.x - 1) / threads.x,
@@ -40,11 +40,24 @@ extern "C" void conv2d(const unsigned char* input, unsigned char* output, int ro
   cudaMemcpy(input_d, input, rows * cols * 3, cudaMemcpyHostToDevice);
   cudaMemcpyToSymbol(_kernel, kernel, KERNEL_ROWS * KERNEL_COLS);
 
+  cudaEvent_t start, stop;
+  cudaEventCreate(&start);
+  cudaEventCreate(&stop);
+
+  cudaEventRecord(start);
   conv2d_kernel<<<blocks, threads>>>(input_d, output_d, rows, cols);
-  cudaDeviceSynchronize();
+  cudaEventRecord(stop);
 
   cudaMemcpy(output, output_d, rows * cols * 3, cudaMemcpyDeviceToHost);
 
+  cudaEventSynchronize(stop);
+  float run_ms;
+  cudaEventElapsedTime(&run_ms, start, stop);
+
+  cudaEventDestroy(stop);
+  cudaEventDestroy(start);
   cudaFree(output_d);
   cudaFree(input_d);
+
+  return run_ms;
 }

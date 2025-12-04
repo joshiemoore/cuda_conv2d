@@ -30,7 +30,8 @@ int main(void) {
       break;
     }
     //cv::GaussianBlur(img, img_conv, cv::Size(3, 3), 0);
-    conv2d(img.data, img_conv.data, rows, cols, kernel);
+    float run_ms = conv2d(img.data, img_conv.data, rows, cols, kernel);
+    printf("Kernel FPS: %f\n", 1000 / run_ms);
     cv::imshow("img", img);
     cv::imshow("img_conv", img_conv);
     if (cv::waitKey(30) == 'q') {
