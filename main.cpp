@@ -1,5 +1,6 @@
 #include <iostream>
 #include <opencv2/opencv.hpp>
+#include <time.h>
 
 #include "conv.h"
 
@@ -25,15 +26,17 @@ int main(void) {
   };
 
   while (true) {
+    clock_t pipeline_time = clock();
     cap >> img;
     if (img.empty()) {
       break;
     }
     //cv::GaussianBlur(img, img_conv, cv::Size(3, 3), 0);
     float run_ms = conv2d(img.data, img_conv.data, rows, cols, kernel);
-    printf("Kernel FPS: %f\n", 1000 / run_ms);
     cv::imshow("img", img);
     cv::imshow("img_conv", img_conv);
+    pipeline_time = clock() - pipeline_time;
+    printf("Kernel FPS: %f, Pipeline FPS: %f\n", 1000 / run_ms, 1 / ((float)pipeline_time / CLOCKS_PER_SEC));
     if (cv::waitKey(30) == 'q') {
       break;
     }
