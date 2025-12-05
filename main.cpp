@@ -25,6 +25,7 @@ int main(void) {
     -1, -1, -1
   };
 
+  bool show_conv = true;
   while (true) {
     clock_t pipeline_time = clock();
     cap >> img;
@@ -33,12 +34,18 @@ int main(void) {
     }
     //cv::GaussianBlur(img, img_conv, cv::Size(3, 3), 0);
     float run_ms = conv2d(img.data, img_conv.data, rows, cols, kernel);
-    cv::imshow("img", img);
-    cv::imshow("img_conv", img_conv);
+    if (show_conv) {
+      cv::imshow("conv", img_conv);
+    } else {
+      cv::imshow("conv", img);
+    }
     pipeline_time = clock() - pipeline_time;
     printf("Kernel FPS: %f, Pipeline FPS: %f\n", 1000 / run_ms, 1 / ((float)pipeline_time / CLOCKS_PER_SEC));
-    if (cv::waitKey(30) == 'q') {
+    int key = cv::waitKey(30);
+    if (key == 'q') {
       break;
+    } else if (key == ' ') {
+      show_conv = !show_conv;
     }
   }
 
